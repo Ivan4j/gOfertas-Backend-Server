@@ -1,0 +1,60 @@
+<html>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <body>
+    <input type="file" name="fileSelector" id="fileSelector"></input><br/>
+    <img id="original_image">
+    <pre><span id="result"></span></pre>
+
+  </body>
+  <script>
+   function dataURLToBlob(dataURL) {
+      var BASE64_MARKER = ';base64,';
+      if (dataURL.indexOf(BASE64_MARKER) == -1) {
+        var parts = dataURL.split(',');
+        var contentType = parts[0].split(':')[1];
+        var raw = parts[1];
+
+        return new Blob([raw], {type: contentType});
+      } else {
+        var parts = dataURL.split(BASE64_MARKER);
+        var contentType = parts[0].split(':')[1];
+        var raw = window.atob(parts[1]);
+        var rawLength = raw.length;
+
+        var uInt8Array = new Uint8Array(rawLength);
+
+        for (var i = 0; i < rawLength; ++i) {
+          uInt8Array[i] = raw.charCodeAt(i);
+        }
+
+        return new Blob([uInt8Array], {type: contentType});
+      }
+    }
+	
+    $('#fileSelector').change(function(event) {
+        var file = event.target.files[0];
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+		//alert(file.name);
+        reader.onload = function(event) {
+          var base64 = reader.result;
+
+          //$('#base64').attr('value', base64);
+          var blob = dataURLToBlob(base64);
+          var formData = new FormData();
+          formData.append('file', blob);
+		  //alert(base64);
+		  
+          $.ajax({
+    			url: 'http://HOST_SERVER/index.php/saveImage',
+              method: 'POST',
+    			    data: { "data": base64, "image_name": file.name },
+            success: function(response) {
+              $('#result').text(response);
+            }
+          });
+          $('#original_image').attr('src', base64);
+        }
+    });
+  </script>
+</html>
