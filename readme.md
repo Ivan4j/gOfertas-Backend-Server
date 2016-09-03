@@ -41,5 +41,3 @@ Here you can find the list of available web services:
 ### Database
 
 Al the data is stored in MySQL
-And of course Dillinger itself is open source with a [public repository][dill]
- on GitHub.
